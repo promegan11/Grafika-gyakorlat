@@ -1,0 +1,10 @@
+w - elore mozgas
+a - balra
+s - hatra
+d - jobbra
+q - kamera fel
+z - kamera le
+egermozgatas - korbenezes
+crosshairrel ki lehet jelolni egy toruszt
+jobbklikk - eltunteti a torust, ami a respawn ido utan lehullik az egbol
+esc - kilepes
