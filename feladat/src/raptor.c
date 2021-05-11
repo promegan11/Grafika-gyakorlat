@@ -20,18 +20,17 @@ static float ang;
 
 typedef GLubyte Pixel[3];
 
-Pixel* images[7];
-GLuint texture_names[7];
+Pixel* images[8];
+GLuint texture_names[8];
 
-int z,k;
-
+int z,k, help_on = 0;
 bool fut = false;
 
 struct Vector3
 {
 	float x, y, z;
 };
-struct Model model[20];
+struct Model model[11];
 
 struct ThirdPersonCamera_t
 {
@@ -164,6 +163,7 @@ void initialize_texture()
 	texture_names[4] = load_texture("back/arrakisday_ft.png", images[4]);
 	texture_names[5] = load_texture("back/arrakisday_up.png", images[5]);
 	texture_names[6] = load_texture("back/arrakisday_rt.png", images[6]);
+	texture_names[7] = load_texture("back/help.png", images[7]);
 
 	glTexEnvf(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE,GL_DECAL);
 
@@ -291,13 +291,14 @@ int InitScene( void )
 	initialize_texture();
 
 	int i;
-	char mod[3][20]={"model/raptor.obj","model/raptor1.obj","model/raptor2.obj"};
-	for(i=0;i<3;++i)
+	char mod[11][25]={"model/raptor.obj","model/raptor_000001.obj","model/raptor_000002.obj","model/raptor_000003.obj","model/raptor_000004.obj","model/raptor_000005.obj","model/raptor_000006.obj",
+	"model/raptor_000007.obj","model/raptor_000008.obj","model/raptor_000009.obj","model/raptor_000010.obj"};
+	for(i=0;i<11;++i)
 	{
 		load_model(mod[i],&model[i]);
 	}
 
-
+	 
 	memset( &camera, 0, sizeof( struct ThirdPersonCamera_t ) );
 	camera.fRadius = 25.0f;
 
@@ -305,13 +306,13 @@ int InitScene( void )
 
 	return GL_TRUE;
 }
-void raptor_move(int leptek,float pozx,float pozy)
+void raptor_move(int leptek,float pozx,float pozy, float rotx)
 {
-	glTranslatef( pozx, 0.0f, pozy+(k*0) );
-	glRotatef( 10, 1.0f, 0.0f, 0.0f );
+	glTranslatef( pozx, 0.0f, pozy-(k*leptek) );
+	glRotatef( rotx, 0.0f, 1.0f, 0.0f );
 	
 	
-	if (k<3)
+	if (k<11)
 	{
 		
 		draw_model(&model[k]);
@@ -319,16 +320,17 @@ void raptor_move(int leptek,float pozx,float pozy)
 		k+=1;
 		
 	}
-	if(k==3)
+	if(k==11)
 	{
 		
 		k=0;
 	}
 	glRotatef( 0, 0.0f, 1.0f, 0.0f );
-	glTranslatef( 50, 0.0f, -10);
+	glTranslatef( 100, 0.0f, -100);
 }
 void DisplayFunction( void )
 {
+	if (!help_on) {
 	int iViewport[4];
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT );
 	glLoadIdentity();
@@ -379,7 +381,7 @@ void DisplayFunction( void )
 	    glBindTexture(GL_TEXTURE_2D, texture_names[0]);
 		glPushMatrix();	
 		
-		raptor_move(5,20,-10);
+		raptor_move(3,20,-10,0);
 		glGetIntegerv( GL_VIEWPORT, iViewport );
 		glPopMatrix();
 		
@@ -387,17 +389,21 @@ void DisplayFunction( void )
 	glPopAttrib();
 	glPushMatrix();	
 	glBindTexture(GL_TEXTURE_2D, texture_names[0]);
-	raptor_move(5,40,-30);
+	raptor_move(5,40,-30,50);
 	glGetIntegerv( GL_VIEWPORT, iViewport );
 	glPopMatrix();
-
+	glPushMatrix();	
+	glBindTexture(GL_TEXTURE_2D, texture_names[0]);
+	raptor_move(-2,-40,60,-180);
+	glGetIntegerv( GL_VIEWPORT, iViewport );
+	glPopMatrix();
 
 	floor_render( 50.0f, -0.75f );
 
 
 	glBindTexture(GL_TEXTURE_2D, 0);
 
-	draw_crosshair();
+	
 
 	glutSwapBuffers();
 	ang++;
@@ -405,15 +411,61 @@ void DisplayFunction( void )
 	{
 		ang=0.0f;
 	}
-	if(z==3)
+	if(z==11)
 	{
 		z=0;
 	}
 
 	
+}else
+{
+	
+	draw_help();
 
+}
 	
 
+}
+void specialFunc(int key, int x, int y) {
+	
+	switch (key) {
+	case GLUT_KEY_F1:
+		if (help_on) {
+			help_on = 0;
+
+			ReshapeFunction(1024,768);
+		}
+		else {
+			help_on = 1;
+
+			
+		}
+	}
+
+}
+void draw_help() {
+	
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+	glBindTexture(GL_TEXTURE_2D, texture_names[7]);
+	glBegin(GL_QUADS);
+	glTexCoord2f(0, 0);
+	glVertex3f(0, 0, 0);
+
+	glTexCoord2f(1, 0);
+	glVertex3f(1024, 0, 0);
+
+	glTexCoord2f(1, 1);
+	glVertex3f(1024, 768, 0);
+	
+	glTexCoord2f(0, 1);
+	glVertex3f(0, 768, 0);
+	glEnd();
+	ReshapeFunction(1024,768);
+	
+
+	glutSwapBuffers();
 }
 
 void IdleFunction( void )
@@ -421,7 +473,7 @@ void IdleFunction( void )
 
 	glutPostRedisplay();
 }
-GLubyte key;
+
 void KeyboardFunction( GLubyte k, int x, int y )
 {
 	static float fRotSpeed = 1.0f;
@@ -516,10 +568,16 @@ void ReshapeFunction( GLsizei width, GLsizei height )
 	glViewport( 0, 0, width, height );
 	glMatrixMode( GL_PROJECTION );
 	glLoadIdentity();
-
-	gluPerspective( 45.0f, (GLdouble) width/height, 0.1f, 500.0f );
+	if (!help_on)
+		gluPerspective( 45.0f, (GLdouble) width/height, 0.1f, 500.0f );
+	else
+		gluOrtho2D(0, width, height, 0);
+	
 	glMatrixMode( GL_MODELVIEW );
 	glLoadIdentity();
+	
+	
+		
 }
 
 
@@ -551,6 +609,7 @@ int main( int argc, char* argv[] )
 	glutMouseWheelFunc(mouseWheel);
 	glutReshapeFunc( ReshapeFunction );
 	glutPassiveMotionFunc( MouseFunction );
+	glutSpecialFunc(specialFunc);
 	glutMainLoop();
 
 	return 0;
