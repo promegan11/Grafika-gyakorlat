@@ -1,5 +1,5 @@
 all:
-	gcc -Iinclude/ data/src/draw.c  data/src/model.c data/src/main.c -lSOIL -lobj -lopengl32 -lglu32 -lglut32 -lm -o grafika.exe -Wall -Wextra -Wpedantic
-linux:
-	gcc -Iinclude/ data/src/draw.c  data/src/model.c data/src/main.c -lSOIL -lobj -lGL -lGLU -lglut -lm -o grafika -Wall -Wextra -Wpedantic
+	gcc -Iinclude/ src/callbacks.c src/camera.c src/init.c src/main.c src/scene.c src/texture.c src/utils.c -lSOIL -lobj -lopengl32 -lglu32 -lglut32 -lm -o grafika.exe -Wall -Wextra -Wpedantic
 
+linux:
+	gcc -Iinclude/ src/callbacks.c src/camera.c src/init.c src/main.c src/scene.c src/texture.c src/utils.c -lSOIL -lobj -lGL -lGLU -lglut -lm -o grafika -Wall -Wextra -Wpedantic
